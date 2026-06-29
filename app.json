@@ -8,6 +8,12 @@
     "scheme": "offbeatpravasiapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d72443b7-0fdb-4d8a-99bc-b966497f3c68"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.offbeatpravasi.offbeatpravasiapp",

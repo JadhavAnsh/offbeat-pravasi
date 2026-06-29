@@ -1,0 +1,46 @@
+name: EAS Preview Update
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - preview
+
+concurrency:
+  group: eas-preview-update-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: Publish preview update
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "Add EXPO_TOKEN to this repository's GitHub Actions secrets."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish EAS Update
+        run: eas update --channel preview --environment preview --message "GitHub ${GITHUB_SHA}"
