@@ -16,8 +16,12 @@ export class ApiError extends Error {
 }
 
 function buildUrl(path: string, queryParams?: RequestConfig['queryParams']) {
-  const base = env.apiUrl ? new URL(env.apiUrl) : new URL('https://example.invalid');
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  if (!env.apiUrl) {
+    throw new Error('EXPO_PUBLIC_API_URL is not configured');
+  }
+
+  const base = new URL(`${env.apiUrl}/`);
+  const normalizedPath = path.replace(/^\/+/, '');
   const url = new URL(normalizedPath, base);
 
   Object.entries(queryParams ?? {}).forEach(([key, value]) => {
@@ -36,13 +40,16 @@ export async function fetchJson<TResponse>(
   config: RequestConfig = {}
 ): Promise<TResponse> {
   const { baseUrl, queryParams, headers, ...init } = config;
-  const url = baseUrl ? new URL(path, baseUrl).toString() : buildUrl(path, queryParams);
+  const url = baseUrl
+    ? new URL(path.replace(/^\/+/, ''), `${baseUrl.replace(/\/+$/, '')}/`).toString()
+    : buildUrl(path, queryParams);
 
   const response = await fetch(url, {
     ...init,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      ...(env.apiKey ? { [env.apiKeyHeader]: env.apiKey } : {}),
       ...headers,
     },
   });

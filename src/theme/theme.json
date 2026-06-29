@@ -1,0 +1,132 @@
+{
+  "brand": {
+    "name": "OffBeat Pravasi",
+    "mood": "grounded, modern, outdoors-first"
+  },
+  "colors": {
+    "primary": {
+      "50": "#E8F5E9",
+      "100": "#C8E6C9",
+      "200": "#A5D6A7",
+      "300": "#81C784",
+      "400": "#66BB6A",
+      "500": "#43A047",
+      "600": "#2E7D32",
+      "700": "#1B5E20",
+      "800": "#123F16",
+      "900": "#08280B",
+      "base": "#1B5E20",
+      "foreground": "#FFFFFF"
+    },
+    "secondary": {
+      "50": "#E3F2FD",
+      "100": "#BBDEFB",
+      "200": "#90CAF9",
+      "300": "#64B5F6",
+      "400": "#42A5F5",
+      "500": "#1E88E5",
+      "600": "#1565C0",
+      "700": "#0D47A1",
+      "800": "#0A3478",
+      "900": "#062553",
+      "base": "#1565C0",
+      "foreground": "#FFFFFF"
+    },
+    "tertiary": {
+      "50": "#FFF3E0",
+      "100": "#FFE0B2",
+      "200": "#FFCC80",
+      "300": "#FFAB91",
+      "400": "#FF8A65",
+      "500": "#FF7043",
+      "600": "#F4511E",
+      "700": "#BF360C",
+      "800": "#8B2607",
+      "900": "#4E1302",
+      "base": "#FF7043",
+      "foreground": "#1A0A04"
+    },
+    "neutral": {
+      "0": "#FFFFFF",
+      "50": "#FAFAFA",
+      "100": "#F2F3F1",
+      "200": "#E1E4DF",
+      "300": "#C7CDC4",
+      "400": "#9EA79C",
+      "500": "#707A70",
+      "600": "#4F594F",
+      "700": "#3F4A3F",
+      "800": "#2A312B",
+      "900": "#151716",
+      "950": "#0B0D0B"
+    },
+    "danger": {
+      "base": "#C62828",
+      "foreground": "#FFFFFF"
+    }
+  },
+  "semantic": {
+    "light": {
+      "background": "#FAFAFA",
+      "surface": "#FFFFFF",
+      "surfaceMuted": "#F2F3F1",
+      "text": "#151716",
+      "muted": "#707A70",
+      "icon": "#4F594F",
+      "border": "#E1E4DF",
+      "tint": "#1B5E20",
+      "link": "#1565C0",
+      "highlight": "#FF7043",
+      "tabIconDefault": "#707A70",
+      "tabIconSelected": "#1B5E20"
+    },
+    "dark": {
+      "background": "#0B0D0B",
+      "surface": "#151716",
+      "surfaceMuted": "#2A312B",
+      "text": "#FAFAFA",
+      "muted": "#C7CDC4",
+      "icon": "#C7CDC4",
+      "border": "#3F4A3F",
+      "tint": "#81C784",
+      "link": "#64B5F6",
+      "highlight": "#FF8A65",
+      "tabIconDefault": "#9EA79C",
+      "tabIconSelected": "#81C784"
+    }
+  },
+  "typography": {
+    "headline": {
+      "fontFamily": "Plus Jakarta Sans",
+      "fontWeight": "800",
+      "letterSpacing": 0
+    },
+    "body": {
+      "fontFamily": "Manrope",
+      "fontWeight": "400",
+      "letterSpacing": 0
+    },
+    "label": {
+      "fontFamily": "Manrope",
+      "fontWeight": "700",
+      "letterSpacing": 0
+    }
+  },
+  "radii": {
+    "xs": 8,
+    "sm": 12,
+    "md": 16,
+    "lg": 20,
+    "xl": 24,
+    "pill": 999
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "2xl": 24,
+    "3xl": 32
+  }
+}

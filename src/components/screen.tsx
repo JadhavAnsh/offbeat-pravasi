@@ -2,18 +2,20 @@ import { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors } from '@src/constants/theme';
-import { useColorScheme } from '@src/hooks/use-color-scheme';
+import { Spacing } from '@src/constants/theme';
+import { nativeWindClasses, useAppTheme } from '@src/theme/theme-manager';
 
 type ScreenProps = PropsWithChildren<{
   contentContainerStyle?: ViewStyle;
 }>;
 
 export function Screen({ children, contentContainerStyle }: ScreenProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { palette } = useAppTheme();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: Colors[colorScheme].background }]}>
+    <SafeAreaView
+      className={nativeWindClasses.screen}
+      style={[styles.safeArea, { backgroundColor: palette.background }]}>
       <ScrollView
         contentContainerStyle={[styles.content, contentContainerStyle]}
         showsVerticalScrollIndicator={false}>
@@ -32,8 +34,8 @@ const styles = StyleSheet.create({
   },
   inner: {
     flex: 1,
-    gap: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    gap: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: 18,
   },
 });

@@ -3,52 +3,47 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { SectionCard } from '@src/components/section-card';
 import { Screen } from '@src/components/screen';
-import { Colors, Fonts } from '@src/constants/theme';
+import { Fonts, Radius, Spacing } from '@src/constants/theme';
 import { APP_ROUTES } from '@src/navigation/routes';
-import { useColorScheme } from '@src/hooks/use-color-scheme';
+import { tokens, useAppTheme } from '@src/theme/theme-manager';
 
-const folders = [
-  'api',
-  'app',
-  'assets',
-  'components',
-  'config',
-  'constants',
-  'features',
-  'hooks',
-  'lib',
-  'navigation',
-  'screens',
-  'services',
-  'store',
-  'types',
-  'utils',
-  'validations',
+const tokenGroups = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'surface',
+  'foreground',
+  'muted',
+  'border',
+  'radius',
+  'spacing',
+  'headline',
+  'body',
 ] as const;
 
 export function ExploreScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const palette = Colors[colorScheme];
+  const { palette } = useAppTheme();
 
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={[styles.eyebrow, { color: palette.tint }]}>Project foundation</Text>
-        <Text style={[styles.title, { color: palette.text }]}>`src/` now owns app logic.</Text>
+        <Text style={[styles.eyebrow, { color: palette.tint }]}>Design system</Text>
+        <Text style={[styles.title, { color: palette.text }]}>NativeWind-ready tokens are in place.</Text>
         <Text style={[styles.copy, { color: palette.muted }]}>
-          Expo Router remains in root `app/`, while reusable code lives under the new feature and
-          platform folders below.
+          The screenshot palette has been captured in JSON and exposed through a theme manager for
+          both StyleSheet and className workflows.
         </Text>
       </View>
 
       <SectionCard
-        title="Implemented folders"
-        description="These directories are in place for API access, state, validations, reusable hooks, and screens.">
+        title="Token groups"
+        description="Use these names in theme-aware components and NativeWind aliases.">
         <View style={styles.folderGrid}>
-          {folders.map((folder) => (
+          {tokenGroups.map((folder) => (
             <View
               key={folder}
-              style={[styles.folderPill, { backgroundColor: palette.background, borderColor: palette.border }]}>
+              style={[styles.folderPill, { backgroundColor: palette.surfaceMuted, borderColor: palette.border }]}>
               <Text style={[styles.folderText, { color: palette.text }]}>{folder}</Text>
             </View>
           ))}
@@ -56,22 +51,22 @@ export function ExploreScreen() {
       </SectionCard>
 
       <SectionCard
-        title="Validation toolkit"
-        description="Zod schemas and react-hook-form resolvers are centralized so forms stay consistent.">
+        title="NativeWind usage"
+        description="Tailwind aliases are sourced from the same JSON design token file.">
         <Text style={[styles.code, { color: palette.text, borderColor: palette.border }]}>
-          {`import { loginSchema, createFormResolver } from '@src/validations';`}
+          {`<View className="rounded-lg border border-border bg-surface p-lg" />`}
         </Text>
       </SectionCard>
 
       <SectionCard
-        title="Reusable state"
-        description="The Zustand store is persisted with SecureStore on native and localStorage on web.">
+        title="Reference colors"
+        description={`${tokens.brand.name} starts from the four colors in the attached board.`}>
         <Text style={[styles.copy, { color: palette.muted }]}>
-          Store selectors can be consumed from anywhere without passing navigation or context props
-          through the tree.
+          Primary {tokens.colors.primary.base}, secondary {tokens.colors.secondary.base}, tertiary{' '}
+          {tokens.colors.tertiary.base}, and neutral {tokens.colors.neutral[50]}.
         </Text>
         <Link href={APP_ROUTES.modal} style={[styles.link, { color: palette.tint }]}>
-          Architecture notes
+          Implementation notes
         </Link>
       </SectionCard>
     </Screen>
@@ -80,7 +75,7 @@ export function ExploreScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    gap: 8,
+    gap: Spacing.sm,
   },
   eyebrow: {
     fontSize: 13,
@@ -103,7 +98,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   folderPill: {
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -113,7 +108,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   code: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     borderWidth: 1,
     fontFamily: Fonts.mono,
     fontSize: 12,

@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Colors } from '@src/constants/theme';
-import { useColorScheme } from '@src/hooks/use-color-scheme';
+import { Radius, Spacing } from '@src/constants/theme';
+import { nativeWindClasses, useAppTheme } from '@src/theme/theme-manager';
 
 type SectionCardProps = PropsWithChildren<{
   title: string;
@@ -10,11 +10,11 @@ type SectionCardProps = PropsWithChildren<{
 }>;
 
 export function SectionCard({ title, description, children }: SectionCardProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const palette = Colors[colorScheme];
+  const { palette } = useAppTheme();
 
   return (
     <View
+      className={nativeWindClasses.card}
       style={[
         styles.card,
         {
@@ -35,10 +35,10 @@ export function SectionCard({ title, description, children }: SectionCardProps) 
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    gap: 16,
-    padding: 16,
+    gap: Spacing.lg,
+    padding: Spacing.lg,
   },
   header: {
     gap: 6,

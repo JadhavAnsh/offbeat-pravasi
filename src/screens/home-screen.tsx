@@ -5,16 +5,15 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { appImages } from '@src/assets';
 import { SectionCard } from '@src/components/section-card';
 import { Screen } from '@src/components/screen';
-import { Colors, Fonts } from '@src/constants/theme';
-import { useColorScheme } from '@src/hooks/use-color-scheme';
+import { Fonts, Radius, Spacing } from '@src/constants/theme';
 import { useAppDiagnostics } from '@src/hooks/use-app-diagnostics';
 import { APP_ROUTES } from '@src/navigation/routes';
 import { useAppStore } from '@src/store/app-store';
+import { nativeWindClasses, tokens, useAppTheme } from '@src/theme/theme-manager';
 import { formatLabel, getInitials } from '@src/utils/format';
 
 export function HomeScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const palette = Colors[colorScheme];
+  const { palette } = useAppTheme();
   const diagnosticsQuery = useAppDiagnostics();
   const themePreference = useAppStore((state) => state.themePreference);
   const setThemePreference = useAppStore((state) => state.setThemePreference);
@@ -32,11 +31,10 @@ export function HomeScreen() {
     <Screen>
       <View style={styles.hero}>
         <View style={styles.heroCopy}>
-          <Text style={[styles.eyebrow, { color: palette.tint }]}>Expo SDK 54 foundation</Text>
-          <Text style={[styles.title, { color: palette.text }]}>Reusable app architecture is in place.</Text>
+          <Text style={[styles.eyebrow, { color: palette.tint }]}>OffBeat Pravasi</Text>
+          <Text style={[styles.title, { color: palette.text }]}>Find the next trail before it finds the crowd.</Text>
           <Text style={[styles.description, { color: palette.muted }]}>
-            `src/` now contains shared API, query, state, validation, and utility layers ready for
-            feature work.
+            A grounded travel interface for treks, local stories, bookings, and organizer tools.
           </Text>
         </View>
         <View style={[styles.logoShell, { backgroundColor: palette.surface, borderColor: palette.border }]}>
@@ -46,8 +44,8 @@ export function HomeScreen() {
       </View>
 
       <SectionCard
-        title="Global store"
-        description="Persisted Zustand state for cross-app preferences and onboarding flags.">
+        title="Theme controls"
+        description="Design tokens now drive colors, spacing, radii, tabs, cards, and buttons.">
         <View style={styles.row}>
           <View style={styles.rowCopy}>
             <Text style={[styles.label, { color: palette.text }]}>Theme preference</Text>
@@ -55,8 +53,11 @@ export function HomeScreen() {
           </View>
           <Pressable
             onPress={() => setThemePreference(nextThemePreference)}
+            className={nativeWindClasses.primaryButton}
             style={[styles.button, { backgroundColor: palette.tint }]}>
-            <Text style={styles.buttonText}>Cycle theme</Text>
+            <Text className={nativeWindClasses.primaryButtonText} style={styles.buttonText}>
+              Cycle theme
+            </Text>
           </Pressable>
         </View>
         <View style={styles.row}>
@@ -68,17 +69,41 @@ export function HomeScreen() {
           </View>
           <Pressable
             onPress={completeOnboarding}
-            style={[styles.button, { backgroundColor: palette.surface, borderColor: palette.border, borderWidth: 1 }]}>
+            style={[
+              styles.button,
+              { backgroundColor: palette.surfaceMuted, borderColor: palette.border, borderWidth: 1 },
+            ]}>
             <Text style={[styles.outlineButtonText, { color: palette.text }]}>Mark done</Text>
           </Pressable>
         </View>
       </SectionCard>
 
       <SectionCard
-        title="React Query"
-        description="Default query client and query factory helpers are available for API and service modules.">
+        title="Reference palette"
+        description="The attached board has been converted into app-ready design tokens.">
+        <View style={styles.swatchRow}>
+          <View style={[styles.swatch, { backgroundColor: tokens.colors.primary.base }]}>
+            <Text style={styles.swatchLabel}>Primary</Text>
+          </View>
+          <View style={[styles.swatch, { backgroundColor: tokens.colors.secondary.base }]}>
+            <Text style={styles.swatchLabel}>Secondary</Text>
+          </View>
+          <View style={[styles.swatch, { backgroundColor: tokens.colors.tertiary.base }]}>
+            <Text style={[styles.swatchLabel, { color: tokens.colors.tertiary.foreground }]}>Tertiary</Text>
+          </View>
+        </View>
+      </SectionCard>
+
+      <SectionCard
+        title="App readiness"
+        description="Query, state, validation, and utility layers remain wired for feature work.">
         {diagnosticsQuery.isLoading ? (
           <ActivityIndicator color={palette.tint} />
+        ) : diagnosticsQuery.isError ? (
+          <View style={styles.metricRow}>
+            <Text style={[styles.label, { color: palette.text }]}>Backend</Text>
+            <Text style={[styles.value, { color: palette.muted }]}>Unavailable</Text>
+          </View>
         ) : (
           diagnosticsQuery.data?.map((item) => (
             <View key={item.label} style={styles.metricRow}>
@@ -90,7 +115,7 @@ export function HomeScreen() {
       </SectionCard>
 
       <Link href={APP_ROUTES.explore} style={[styles.inlineLink, { color: palette.tint }]}>
-        Explore the folder map
+        Explore the design tokens
       </Link>
     </Screen>
   );
@@ -104,7 +129,7 @@ const styles = StyleSheet.create({
   },
   heroCopy: {
     flex: 1,
-    gap: 8,
+    gap: Spacing.sm,
   },
   eyebrow: {
     fontSize: 13,
@@ -124,9 +149,9 @@ const styles = StyleSheet.create({
   },
   logoShell: {
     alignItems: 'center',
-    borderRadius: 24,
+    borderRadius: Radius.xl,
     borderWidth: 1,
-    gap: 8,
+    gap: Spacing.sm,
     justifyContent: 'center',
     minHeight: 120,
     minWidth: 120,
@@ -144,12 +169,12 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.md,
     justifyContent: 'space-between',
   },
   rowCopy: {
     flex: 1,
-    gap: 4,
+    gap: Spacing.xs,
   },
   metricRow: {
     alignItems: 'center',
@@ -164,7 +189,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    borderRadius: 999,
+    borderRadius: Radius.pill,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
@@ -180,5 +205,21 @@ const styles = StyleSheet.create({
   inlineLink: {
     fontSize: 15,
     fontWeight: '700',
+  },
+  swatchRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  swatch: {
+    borderRadius: Radius.md,
+    flex: 1,
+    minHeight: 72,
+    justifyContent: 'flex-end',
+    padding: Spacing.md,
+  },
+  swatchLabel: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '800',
   },
 });

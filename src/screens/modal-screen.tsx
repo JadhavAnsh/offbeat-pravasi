@@ -3,28 +3,28 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { SectionCard } from '@src/components/section-card';
 import { Screen } from '@src/components/screen';
-import { Colors, Fonts } from '@src/constants/theme';
-import { useColorScheme } from '@src/hooks/use-color-scheme';
+import { Fonts, Spacing } from '@src/constants/theme';
 import { APP_ROUTES } from '@src/navigation/routes';
+import { useAppTheme } from '@src/theme/theme-manager';
 
 export function ModalScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const palette = Colors[colorScheme];
+  const { palette } = useAppTheme();
 
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: palette.text }]}>Shared app layers</Text>
+        <Text style={[styles.title, { color: palette.text }]}>Theme implementation</Text>
         <Text style={[styles.copy, { color: palette.muted }]}>
-          This modal summarizes the cross-cutting modules that were added for future features.
+          The attached visual board now has documentation, JSON tokens, a theme manager, and
+          NativeWind aliases.
         </Text>
       </View>
 
-      <SectionCard title="Included modules">
-        <Text style={[styles.item, { color: palette.text }]}>`src/lib/react-query` for query client defaults and query factories.</Text>
-        <Text style={[styles.item, { color: palette.text }]}>`src/store` and `src/services/storage.service.ts` for persisted global state.</Text>
-        <Text style={[styles.item, { color: palette.text }]}>`src/validations` for Zod schemas and form resolver helpers.</Text>
-        <Text style={[styles.item, { color: palette.text }]}>`src/utils` for formatting, guards, error parsing, and form helpers.</Text>
+      <SectionCard title="Included files">
+        <Text style={[styles.item, { color: palette.text }]}>`design.md` describes the visual language and usage rules.</Text>
+        <Text style={[styles.item, { color: palette.text }]}>`src/theme/theme.json` stores colors, typography, spacing, and radii.</Text>
+        <Text style={[styles.item, { color: palette.text }]}>`src/theme/theme-manager.ts` exposes palette hooks and NativeWind class helpers.</Text>
+        <Text style={[styles.item, { color: palette.text }]}>`tailwind.config.js` maps JSON tokens into NativeWind utility names.</Text>
       </SectionCard>
 
       <Link href={APP_ROUTES.home} dismissTo style={[styles.link, { color: palette.tint }]}>
@@ -36,7 +36,7 @@ export function ModalScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    gap: 8,
+    gap: Spacing.sm,
   },
   title: {
     fontFamily: Fonts.rounded,
