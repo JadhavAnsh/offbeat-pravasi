@@ -1,6 +1,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import '@/global.css';
 import 'react-native-reanimated';
 
@@ -8,8 +9,10 @@ import { AppProvider } from '@/providers/app-provider';
 import { useAppTheme } from '@/theme/theme-manager';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  initialRouteName: 'index',
 };
+
+SplashScreen.setOptions({ duration: 450, fade: true });
 
 export default function RootLayout() {
   const { mode, palette } = useAppTheme();
@@ -31,6 +34,8 @@ export default function RootLayout() {
           },
         }}>
         <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="auth" options={{ headerShown: false, animation: 'fade' }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Architecture' }} />
         </Stack>
