@@ -195,7 +195,10 @@ export function AuthScreen() {
               <View style={styles.divider} />
             </View>
 
-            <AnimatedPressable accessibilityRole="button" accessibilityLabel="Continue with Google" style={styles.socialButton}>
+            <AnimatedPressable
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Google"
+              style={styles.socialButton}>
               <Image source={require('@/assets/images/google-g.png')} style={styles.googleMark} contentFit="contain" />
               <Text style={styles.socialText}>Continue with Google</Text>
             </AnimatedPressable>
