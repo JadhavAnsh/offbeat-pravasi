@@ -1,4 +1,5 @@
 import { env } from '@src/config/env';
+import { useAuthStore } from '@src/features/auth/store';
 import { toErrorMessage } from '@src/utils/error';
 
 import type { ApiErrorPayload, RequestConfig } from '@src/types/api';
@@ -43,16 +44,23 @@ export async function fetchJson<TResponse>(
   const url = baseUrl
     ? new URL(path.replace(/^\/+/, ''), `${baseUrl.replace(/\/+$/, '')}/`).toString()
     : buildUrl(path, queryParams);
+  const accessToken = useAuthStore.getState().accessToken;
 
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(env.apiKey ? { [env.apiKeyHeader]: env.apiKey } : {}),
-      ...headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(env.apiKey ? { [env.apiKeyHeader]: env.apiKey } : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...headers,
+      },
+    });
+  } catch {
+    throw new ApiError('Unable to reach the server. Check your connection and try again.', 0);
+  }
 
   const rawBody = await response.text();
   const parsedBody = rawBody ? tryParseJson(rawBody) : undefined;
@@ -60,7 +68,9 @@ export async function fetchJson<TResponse>(
   if (!response.ok) {
     throw new ApiError(
       parsedBody && typeof parsedBody === 'object' && 'message' in parsedBody
-        ? String(parsedBody.message)
+        ? Array.isArray(parsedBody.message)
+          ? parsedBody.message.join('\n')
+          : String(parsedBody.message)
         : `Request failed with status ${response.status}`,
       response.status,
       parsedBody as ApiErrorPayload | undefined

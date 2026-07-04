@@ -4,10 +4,13 @@ import { AccessibilityInfo, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 import { BrandMark } from '@/components/brand-mark';
+import { useAuthStore } from '@/features/auth/store';
 
 export function SplashScreen() {
   const router = useRouter();
   const drift = useSharedValue(0);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   useEffect(() => {
     let mounted = true;
@@ -16,12 +19,14 @@ export function SplashScreen() {
         drift.value = withRepeat(withTiming(1, { duration: 1900, easing: Easing.inOut(Easing.sin) }), -1, true);
       }
     });
-    const timeout = setTimeout(() => router.replace('/auth'), 2100);
+    const timeout = hasHydrated
+      ? setTimeout(() => router.replace(isLoggedIn ? '/home' : '/auth'), 2100)
+      : undefined;
     return () => {
       mounted = false;
-      clearTimeout(timeout);
+      if (timeout) clearTimeout(timeout);
     };
-  }, [drift, router]);
+  }, [drift, hasHydrated, isLoggedIn, router]);
 
   const markStyle = useAnimatedStyle(() => ({ transform: [{ translateY: drift.value * -7 }] }));
 

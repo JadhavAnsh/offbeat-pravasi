@@ -8,6 +8,8 @@ import { Screen } from '@src/components/screen';
 import { Fonts, Radius, Spacing } from '@src/constants/theme';
 import { useAppDiagnostics } from '@src/hooks/use-app-diagnostics';
 import { APP_ROUTES } from '@src/navigation/routes';
+import { useLogout } from '@src/features/auth/hooks';
+import { useAuthStore } from '@src/features/auth/store';
 import { useAppStore } from '@src/store/app-store';
 import { nativeWindClasses, tokens, useAppTheme } from '@src/theme/theme-manager';
 import { formatLabel, getInitials } from '@src/utils/format';
@@ -19,6 +21,8 @@ export function HomeScreen() {
   const setThemePreference = useAppStore((state) => state.setThemePreference);
   const onboardingCompleted = useAppStore((state) => state.onboardingCompleted);
   const completeOnboarding = useAppStore((state) => state.completeOnboarding);
+  const user = useAuthStore((state) => state.user);
+  const logoutMutation = useLogout();
 
   const nextThemePreference =
     themePreference === 'system'
@@ -42,6 +46,22 @@ export function HomeScreen() {
           <Text style={[styles.logoLabel, { color: palette.text }]}>{getInitials('OffBeat Pravasi')}</Text>
         </View>
       </View>
+
+      <SectionCard
+        title={`Welcome${user?.fullName ? `, ${user.fullName}` : ''}`}
+        description={user?.email ?? 'Your authenticated home page.'}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={logoutMutation.isPending}
+          onPress={() => logoutMutation.mutate()}
+          style={[styles.button, styles.logoutButton, { borderColor: palette.border }]}>
+          {logoutMutation.isPending ? (
+            <ActivityIndicator color={palette.tint} />
+          ) : (
+            <Text style={[styles.outlineButtonText, { color: palette.text }]}>Log out</Text>
+          )}
+        </Pressable>
+      </SectionCard>
 
       <SectionCard
         title="Theme controls"
@@ -201,6 +221,10 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     fontSize: 13,
     fontWeight: '700',
+  },
+  logoutButton: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
   },
   inlineLink: {
     fontSize: 15,

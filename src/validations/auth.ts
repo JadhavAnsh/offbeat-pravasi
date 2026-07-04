@@ -4,7 +4,7 @@ import { emailSchema, nameSchema, passwordSchema } from './common';
 
 export const loginSchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
+  password: z.string().min(1, 'Enter your password'),
 });
 
 export const signUpSchema = z

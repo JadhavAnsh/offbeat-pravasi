@@ -1,21 +1,21 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import * as SplashScreen from 'expo-splash-screen';
 import '@/global.css';
 import 'react-native-reanimated';
 
 import { AppProvider } from '@/providers/app-provider';
+import { useAuthStore } from '@/features/auth/store';
 import { useAppTheme } from '@/theme/theme-manager';
 
 export const unstable_settings = {
   initialRouteName: 'index',
 };
 
-SplashScreen.setOptions({ duration: 450, fade: true });
-
 export default function RootLayout() {
   const { mode, palette } = useAppTheme();
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const navigationTheme = mode === 'dark' ? DarkTheme : DefaultTheme;
 
   return (
@@ -35,9 +35,14 @@ export default function RootLayout() {
         }}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="auth" options={{ headerShown: false, animation: 'fade' }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Architecture' }} />
+          <Stack.Protected guard={hasHydrated && !isLoggedIn}>
+            <Stack.Screen name="auth" options={{ headerShown: false, animation: 'fade' }} />
+            <Stack.Screen name="verify-otp" options={{ headerShown: false, animation: 'slide_from_right' }} />
+          </Stack.Protected>
+          <Stack.Protected guard={hasHydrated && isLoggedIn}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Architecture' }} />
+          </Stack.Protected>
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

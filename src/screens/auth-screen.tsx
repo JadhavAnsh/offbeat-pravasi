@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut } from 'react-native-reanimated';
@@ -9,15 +9,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/animated-pressable';
 import { BrandMark } from '@/components/brand-mark';
+import { useLogin, useSignUp } from '@/features/auth/hooks';
+import { loginSchema, signUpSchema } from '@/validations/auth';
+import { toErrorMessage } from '@/utils/error';
 
 type AuthMode = 'login' | 'signup';
 
 export function AuthScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ email?: string; verified?: string }>();
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<AuthMode>('login');
   const [secure, setSecure] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [values, setValues] = useState({ fullName: '', email: params.email ?? '', password: '', confirmPassword: '' });
+  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState<string | null>(params.verified === '1' ? 'Email verified. You can log in now.' : null);
+  const loginMutation = useLogin();
+  const signUpMutation = useSignUp();
   const [contentHeight, setContentHeight] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const canScroll = contentHeight > viewportHeight + 1;
@@ -25,18 +34,54 @@ export function AuthScreen() {
   const changeMode = (nextMode: AuthMode) => {
     if (nextMode === mode) return;
     void Haptics.selectionAsync();
+    setFieldErrors({});
+    setFormError(null);
+    setNotice(null);
     setMode(nextMode);
   };
 
-  const submit = () => {
-    setLoading(true);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setTimeout(() => {
-      setLoading(false);
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace('/home');
-    }, 700);
+  const setValue = (name: keyof typeof values, value: string) => {
+    setValues((current) => ({ ...current, [name]: value }));
+    setFieldErrors((current) => ({ ...current, [name]: '' }));
+    setFormError(null);
   };
+
+  const submit = async () => {
+    const result = mode === 'login' ? loginSchema.safeParse(values) : signUpSchema.safeParse(values);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const name = String(issue.path[0] ?? 'form');
+        errors[name] ??= issue.message;
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setFormError(null);
+    setNotice(null);
+    try {
+      if (mode === 'login') {
+        await loginMutation.mutateAsync({ email: result.data.email, password: result.data.password });
+        router.replace('/home');
+      } else {
+        const signUpResult = signUpSchema.parse(values);
+        await signUpMutation.mutateAsync({
+          email: signUpResult.email,
+          fullName: signUpResult.fullName,
+          password: signUpResult.password,
+        });
+        router.push({ pathname: '/verify-otp', params: { email: signUpResult.email } });
+      }
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      setFormError(toErrorMessage(error, mode === 'login' ? 'Unable to log in.' : 'Unable to create your account.'));
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  };
+
+  const loading = loginMutation.isPending || signUpMutation.isPending;
 
   return (
     <KeyboardAvoidingView style={styles.page} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -88,16 +133,19 @@ export function AuthScreen() {
           <View style={styles.form}>
             {mode === 'signup' && (
               <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
-                <Field icon="person-outline" label="Full name" placeholder="Your name" autoComplete="name" />
+                <Field icon="person-outline" label="Full name" placeholder="Your name" autoComplete="name" value={values.fullName} error={fieldErrors.fullName} onChangeText={(value) => setValue('fullName', value)} />
               </Animated.View>
             )}
-            <Field icon="mail-outline" label="Email" placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" autoComplete="email" />
+            <Field icon="mail-outline" label="Email" placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" autoComplete="email" value={values.email} error={fieldErrors.email} onChangeText={(value) => setValue('email', value)} />
             <Field
               icon="lock-closed-outline"
               label="Password"
               placeholder={mode === 'login' ? 'Your password' : 'At least 8 characters'}
               secureTextEntry={secure}
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              value={values.password}
+              error={fieldErrors.password}
+              onChangeText={(value) => setValue('password', value)}
               trailing={
                 <AnimatedPressable
                   hitSlop={8}
@@ -108,6 +156,22 @@ export function AuthScreen() {
                 </AnimatedPressable>
               }
             />
+
+            {mode === 'signup' && (
+              <Field
+                icon="lock-closed-outline"
+                label="Confirm password"
+                placeholder="Repeat your password"
+                secureTextEntry={secure}
+                autoComplete="new-password"
+                value={values.confirmPassword}
+                error={fieldErrors.confirmPassword}
+                onChangeText={(value) => setValue('confirmPassword', value)}
+              />
+            )}
+
+            {!!formError && <Text selectable accessibilityRole="alert" style={styles.errorText}>{formError}</Text>}
+            {!!notice && <Text selectable accessibilityRole="alert" style={styles.noticeText}>{notice}</Text>}
 
             {mode === 'login' && (
               <AnimatedPressable accessibilityRole="button" style={styles.forgotButton}>
@@ -147,9 +211,9 @@ export function AuthScreen() {
   );
 }
 
-type FieldProps = React.ComponentProps<typeof TextInput> & { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; trailing?: React.ReactNode };
+type FieldProps = React.ComponentProps<typeof TextInput> & { error?: string; icon: React.ComponentProps<typeof Ionicons>['name']; label: string; trailing?: React.ReactNode };
 
-function Field({ icon, label, trailing, ...inputProps }: FieldProps) {
+function Field({ error, icon, label, trailing, ...inputProps }: FieldProps) {
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.fieldWrap}>
@@ -167,6 +231,7 @@ function Field({ icon, label, trailing, ...inputProps }: FieldProps) {
         />
         {trailing}
       </View>
+      {!!error && <Text selectable style={styles.fieldError}>{error}</Text>}
     </View>
   );
 }
@@ -191,6 +256,9 @@ const styles = StyleSheet.create({
   form: { gap: 15 },
   fieldWrap: { gap: 7 },
   label: { color: '#3D5044', fontSize: 12, fontWeight: '700', paddingLeft: 2 },
+  fieldError: { color: '#B33A2B', fontSize: 12, lineHeight: 17, paddingLeft: 2 },
+  errorText: { color: '#9C2F23', backgroundColor: '#FBE9E5', borderRadius: 12, borderCurve: 'continuous', padding: 12, fontSize: 13, lineHeight: 19 },
+  noticeText: { color: '#285943', backgroundColor: '#E7F1EA', borderRadius: 12, borderCurve: 'continuous', padding: 12, fontSize: 13, lineHeight: 19 },
   field: { minHeight: 56, borderWidth: 1.5, borderColor: '#DDE2DB', borderRadius: 17, borderCurve: 'continuous', paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: '#FFFFFF' },
   fieldFocused: { borderColor: '#285943', backgroundColor: '#FCFFFC' },
   input: { flex: 1, minHeight: 52, paddingVertical: 0, color: '#17251D', fontSize: 15 },
