@@ -12,5 +12,6 @@ export default (): ExpoConfig => ({
     apiKey: process.env.EXPO_PUBLIC_API_KEY ?? '',
     apiKeyHeader: process.env.EXPO_PUBLIC_API_KEY_HEADER ?? 'x-api-key',
     appEnv: process.env.EXPO_PUBLIC_APP_ENV ?? 'development',
+    demoData: process.env.EXPO_PUBLIC_DEMO_DATA ?? 'false',
   },
 });

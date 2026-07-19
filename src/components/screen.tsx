@@ -18,6 +18,7 @@ export function Screen({ children, contentContainerStyle }: ScreenProps) {
       style={[styles.safeArea, { backgroundColor: palette.background }]}>
       <ScrollView
         contentContainerStyle={[styles.content, contentContainerStyle]}
+        contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}>
         <View style={styles.inner}>{children}</View>
       </ScrollView>

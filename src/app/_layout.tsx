@@ -42,6 +42,15 @@ export default function RootLayout() {
           <Stack.Protected guard={hasHydrated && isLoggedIn}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Architecture' }} />
+            <Stack.Screen
+              name="account"
+              options={{ presentation: 'formSheet', sheetAllowedDetents: [0.55], sheetGrabberVisible: true, title: 'Account' }}
+            />
+            <Stack.Screen
+              name="explore-filters"
+              options={{ presentation: 'formSheet', sheetAllowedDetents: [0.7, 1], sheetGrabberVisible: true, title: 'Filters' }}
+            />
+            <Stack.Screen name="treks/[id]" options={{ title: 'Trek', headerBackButtonDisplayMode: 'minimal' }} />
           </Stack.Protected>
         </Stack>
         <StatusBar style="auto" />

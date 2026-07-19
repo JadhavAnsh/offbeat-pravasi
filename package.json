@@ -8,6 +8,7 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "test": "jest --runInBand",
     "web": "expo start --web",
     "lint": "expo lint"
   },
@@ -27,6 +28,7 @@
     "expo-haptics": "~15.0.8",
     "expo-image": "~3.0.11",
     "expo-linking": "~8.0.11",
+    "expo-location": "~19.0.8",
     "expo-router": "~6.0.23",
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
@@ -52,10 +54,19 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@types/jest": "29.5.14",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "jest-expo": "~54.0.17",
     "typescript": "~5.9.2"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
   },
   "private": true
 }
